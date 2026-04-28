@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>E-Commerce Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: 'Segoe UI';
+      margin: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    button {
+      background: black;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Chatbot */
+    .chat-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: black;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .chatbox {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      display: none;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: black;
+      color: white;
+      padding: 10px;
+    }
+
+    .chat-body {
+      height: 250px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .chat-input {
+      display: flex;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+    }
+
+    .chat-input button {
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🛒 Retro Scales</h1>
+</header>
+
+<div class="container" id="products"></div>
+
+<!-- Chat Button -->
+<div class="chat-btn" onclick="toggleChat()">💬</div>
+
+<!-- Chatbox -->
+<div class="chatbox" id="chatbox">
+  <div class="chat-header">Chatbot</div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input">
+    <input type="text" id="input" placeholder="Ask something...">
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+const products = [
+  {id:1, name:"Laptop", price:50000},
+  {id:2, name:"Phone", price:20000},
+  {id:3, name:"Headphones", price:3000},
+  {id:4, name:"Television", price:45000},
+];
+
+let cart = [];
+
+function loadProducts(){
+  let html = "";
+  products.forEach(p=>{
+    html += `
+    <div class="card">
+      <h3>${p.name}</h3>
+      <p>₹${p.price}</p>
+      <button onclick="addToCart(${p.id})">Add to Cart</button>
+    </div>`;
+  });
+  document.getElementById("products").innerHTML = html;
+}
+
+function addToCart(id){
+  let product = products.find(p=>p.id===id);
+  cart.push(product);
+  alert(product.name + " added to cart!");
+}
+
+/* Chatbot */
+function toggleChat(){
+  let box = document.getElementById("chatbox");
+  box.style.display = box.style.display === "flex" ? "none" : "flex";
+}
+
+function send(){
+  let input = document.getElementById("input").value;
+  addMsg("You", input);
+
+  let response = process(input);
+  addMsg("Bot", response);
+}
+
+function addMsg(sender, text){
+  document.getElementById("chatBody").innerHTML += `<p><b>${sender}:</b> ${text}</p>`;
+}
+
+function process(cmd){
+  cmd = cmd.toLowerCase();
+
+  if(cmd.includes("product")){
+    return products.map(p=>`${p.name} ₹${p.price}`).join("<br>");
+  }
+
+  if(cmd.includes("cart")){
+    return cart.map(p=>p.name).join(", ") || "Cart empty";
+  }
+
+  if(cmd.includes("checkout")){
+    let total = cart.reduce((s,p)=>s+p.price,0);
+    cart = [];
+    return "Total ₹"+total+" Order placed!";
+  }
+
+  return "Ask: products, cart, checkout";
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
